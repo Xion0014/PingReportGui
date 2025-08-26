@@ -1,12 +1,11 @@
-# Ping Tool GUI Version Created by Caleb Flynn From Hypercare
-# Refix Creation of LOG folder and dumping logs in there and NOT in DESKTOP
+# Ping Tool GUI Version Created by Xion
 
 Add-Type -AssemblyName PresentationFramework
 Add-Type -AssemblyName PresentationCore
 Add-Type -AssemblyName WindowsBase
 Add-Type -AssemblyName System.Windows.Forms
 
-# --- Helper: find the folder the script/exe lives in ---
+# --- Helper: find the folder the script lives in ---
 function Get-BaseDirectory {
     if ($PSScriptRoot -and (Test-Path $PSScriptRoot)) { return $PSScriptRoot }
     if ($MyInvocation.MyCommand.Path) { return (Split-Path -Parent $MyInvocation.MyCommand.Path) }
@@ -225,4 +224,5 @@ $runButton.Add_Click({
 })
 
 # Show window
+
 $Window.ShowDialog() | Out-Null
