@@ -1,4 +1,5 @@
 # Ping Tool GUI Version Created by Xion
+# Copyright 2025 Circke K Stores Inc. A Couche-Tard Company All Rights Reserved.
 
 Add-Type -AssemblyName PresentationFramework
 Add-Type -AssemblyName PresentationCore
@@ -226,3 +227,4 @@ $runButton.Add_Click({
 # Show window
 
 $Window.ShowDialog() | Out-Null
+
