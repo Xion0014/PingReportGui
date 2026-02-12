@@ -1,4 +1,5 @@
 # Ping Tool GUI Version Created by Caleb Flynn From Hypercare
+# Copyright 2026 Circke K Stores Inc. A Couche-Tard Company All Rights Reserved.
 
 Add-Type -AssemblyName PresentationFramework
 Add-Type -AssemblyName PresentationCore
@@ -281,3 +282,4 @@ $runButton.Add_Click({
 
 # Show window
 $Window.ShowDialog() | Out-Null
+
