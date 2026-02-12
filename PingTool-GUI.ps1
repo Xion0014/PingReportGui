@@ -1,12 +1,11 @@
-# Ping Tool GUI Version Created by Xion
-# Copyright 2025 Circke K Stores Inc. A Couche-Tard Company All Rights Reserved.
+# Ping Tool GUI Version Created by Caleb Flynn From Hypercare
 
 Add-Type -AssemblyName PresentationFramework
 Add-Type -AssemblyName PresentationCore
 Add-Type -AssemblyName WindowsBase
 Add-Type -AssemblyName System.Windows.Forms
 
-# --- Helper: find the folder the script lives in ---
+# --- Helper: find the folder the script/exe lives in ---
 function Get-BaseDirectory {
     if ($PSScriptRoot -and (Test-Path $PSScriptRoot)) { return $PSScriptRoot }
     if ($MyInvocation.MyCommand.Path) { return (Split-Path -Parent $MyInvocation.MyCommand.Path) }
@@ -17,34 +16,79 @@ function Get-BaseDirectory {
     return (Get-Location).Path
 }
 
-# Create WPF window
+# ------------------------------------------------------------
+# XAML UI
+# ------------------------------------------------------------
 [xml]$xaml = @"
-<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
-        Title="Hypercare Store Ping Tool" Height="500" Width="800" WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Hypercare Store Ping Tool"
+        Height="550" Width="800"
+        WindowStartupLocation="CenterScreen"
+        Background="#1E1E1E"
+        Foreground="White">
+
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        
+
         <TextBlock Grid.Row="0" Text="CSV File Path:" Margin="0,0,0,5"/>
+
         <StackPanel Grid.Row="1" Orientation="Horizontal">
-            <TextBox x:Name="csvPathBox" Width="600" Margin="0,0,5,0" Background="#2D2D30" Foreground="White"/>
-            <Button x:Name="browseButton" Content="Browse..." Width="80"/>
+            <TextBox x:Name="csvPathBox"
+                     Width="600"
+                     Margin="0,0,5,0"
+                     Background="#2D2D30"
+                     Foreground="White"/>
+            <Button x:Name="browseButton"
+                    Content="Browse..."
+                    Width="80"/>
         </StackPanel>
-        
-        <TextBlock Grid.Row="2" Text="Store Numbers (comma separated):" Margin="0,10,0,5"/>
-        <TextBox x:Name="storeInput" Grid.Row="2" Margin="0,30,0,10" Height="25" Background="#2D2D30" Foreground="White"/>
-        
-        <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto" Background="#1E1E1E" Margin="0,10,0,10">
-            <RichTextBox x:Name="outputBox" IsReadOnly="True" Background="#1E1E1E" BorderThickness="0" FontFamily="Consolas" Foreground="White"/>
+
+        <TextBlock Grid.Row="2"
+                   Text="For certain Canadian sites, the Ping Report may not display POS, HPOS, or VPOS devices. Please verify this information in Mongoose to ensure accuracy."
+                   Margin="0,5,0,10"
+                   Foreground="Orange"
+                   FontWeight="Bold"
+                   FontSize="12"
+                   TextWrapping="Wrap"/>
+
+        <TextBlock Grid.Row="3"
+                   Text="Store Numbers (comma separated):"
+                   Margin="0,5,0,5"/>
+
+        <TextBox x:Name="storeInput"
+                 Grid.Row="3"
+                 Margin="0,30,0,10"
+                 Height="25"
+                 Background="#2D2D30"
+                 Foreground="White"/>
+
+        <ScrollViewer Grid.Row="4"
+                      VerticalScrollBarVisibility="Auto"
+                      Background="#1E1E1E"
+                      Margin="0,10,0,10">
+            <RichTextBox x:Name="outputBox"
+                         IsReadOnly="True"
+                         Background="#1E1E1E"
+                         BorderThickness="0"
+                         FontFamily="Consolas"
+                         Foreground="White"/>
         </ScrollViewer>
-        
-        <Button x:Name="runButton" Grid.Row="4" Content="Run Ping Test" Height="35" Background="#007ACC" Foreground="White"/>
+
+        <Button x:Name="runButton"
+                Grid.Row="6"
+                Content="Run Ping Test"
+                Height="35"
+                Background="#007ACC"
+                Foreground="White"/>
     </Grid>
 </Window>
 "@
@@ -59,6 +103,7 @@ $browseButton = $Window.FindName("browseButton")
 $storeInput = $Window.FindName("storeInput")
 $outputBox = $Window.FindName("outputBox")
 $runButton = $Window.FindName("runButton")
+
 
 # Browse button
 $browseButton.Add_Click({
@@ -115,6 +160,16 @@ $syncHash.LogAction = {
             "Cyan"   { Add-ColoredLine $outputBox $storeNumber $msg ([System.Drawing.Color]::FromName("Cyan")) $fontSize $alignment }
             default  { Add-ColoredLine $outputBox $storeNumber $msg ([System.Drawing.Color]::FromName("White")) $fontSize $alignment }
         }
+    })
+}
+
+$syncHash.ProgressAction = {
+    param([double]$percent)
+    $syncHash.Window.Dispatcher.Invoke({
+        $pb = $syncHash.Window.FindName("progressBar")
+        $pt = $syncHash.Window.FindName("progressText")
+        $pb.Value = $percent
+        $pt.Text = "$percent`%"
     })
 }
 
@@ -225,6 +280,4 @@ $runButton.Add_Click({
 })
 
 # Show window
-
 $Window.ShowDialog() | Out-Null
-
